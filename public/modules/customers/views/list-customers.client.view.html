@@ -1,0 +1,373 @@
+<section data-ng-controller="ListCustomersController">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <div class="well well-sm">
+                <table border='0' width="100%">
+                   <tr style="line-height: 15px;">
+                        <td>Customers</td>
+                   </tr>
+                </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    
+    <div class="row">
+        <div class="col-lg-12">            
+            <div class="input-group custom-search-form">
+                <input type="text" class="form-control"
+                    data-ng-model="thisLookup" 
+                    placeholder="Enter a customer name..." 
+                    typeahead="org for org in getOrganisations($viewValue)" 
+                    typeahead-loading="progress.loadingCustomer" 
+                    typeahead-no-results="noResults"
+                    typeahead-min-length="3" 
+                    typeahead-wait-ms="750" 
+                     typeahead-on-select='selectOrganisation($item, $model, $label)'>
+                <div ng-show="noResults">
+                    <i class="glyphicon glyphicon-remove"></i> No customers found.
+                </div>
+                <span class="input-group-btn">
+                    <button class="btn btn-default btn-sm" type="button" data-ng-click="getCustomers();">
+                        <i data-ng-class="{'fa fa-search' : progress.loadingCustomer!=1, 'fa fa-refresh fa-spin' : progress.loadingCustomer==1}"></i>                        
+                    </button>
+                </span>
+            </div>         
+        </div>
+    </div>
+    <!-- /.row -->
+
+    <br />                    
+    <div class="row">
+        <div class="col-sm-6 col-lg-4" data-ng-repeat="customer in customers">
+            <div class="panel" ng-class="'panel-'+customer.class">
+                <div class="panel-heading">
+                     <a href="#!customers/{{customer.DocID}}">
+                        <div style="display: -webkit-flex; display: -moz-flex; display: flex;">
+                            <div class="pull-left">{{customer.CompanyName}}</div>
+                            <div class="pull-right"><i class="fa fa-arrow-circle-right"></i></div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+                <div class="panel-content">
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <div class="project">{{customer.ProjectName === '' ? 'General' : customer.ProjectName}}</div>
+                            <div class="actions">                      
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn" data-ng-click="selectCustomer('{{customer.DocID}}'); message=''; processing=0;" 
+                                        data-toggle="modal" data-target="#iCareModal1"
+                                        data-toggle="tooltip" data-placement="top" title="Create credit purchase">
+                                        <span class="fa fa-usd"</span>
+                                    </button>
+                                    <button type="button" class="btn" data-ng-click="selectCustomer('{{customer.DocID}}'); message=''; processing=0;" 
+                                        data-toggle="modal" data-target="#iCareModal2"
+                                        data-toggle="tooltip" data-placement="top" title="Create time sheet">
+                                        <span class="fa fa-clock-o"</span>
+                                    </button>
+                                    <button type="button" class="btn" data-ng-click="selectCustomer('{{customer.DocID}}'); message=''; processing=0;" 
+                                        data-toggle="modal" data-target="#iCareModal3"
+                                        data-toggle="tooltip" data-placement="top" title="Create statement">
+                                        <span class="fa fa-list-alt"</span>
+                                    </button>
+                                    <button type="button" class="btn" data-ng-click="selectCustomer('{{customer.DocID}}'); message=''; processing=0;" 
+                                        data-toggle="modal" data-target="#iCareModal4"
+                                        data-toggle="tooltip" data-placement="top" title="Send notification">
+                                        <span class="fa fa-envelope-o"</span>
+                                    </button>
+                                </div>        
+                            </div>                      
+                        </div>
+                        <div class="col-xs-3 text-right">
+                            <div>{{customer.Balance.HoursPurchased}}</div>
+                            <div>{{customer.Balance.HoursUsed}}</div>
+                            <div class="huge">{{customer.Balance.Balance}}</div>
+                        </div>
+                    </div>                      
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+    
+    <small>
+    <form data-ng-submit="createCreditPurchase()">
+    <div class="modal fade" id="iCareModal1" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" data-ng-show="progress.processingAction==-1 || progress.processingAction==0 || progress.processingAction==2"><span aria-hidden="true">&times;</span></button>
+                    <div class="modal-title"><i class="btn btn-md fa fa-usd"></i>New Credit Purchase</div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label" for="cp_date">Purchase Date</label>
+                        <div class="controls">
+                            <input type="date" name="cp_date" id="cp_date" class="form-control" required data-ng-model="cp.date">    
+                        </div>  
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label" for="cp_creditvalue">No. of Hours</label>
+                        <div class="controls">
+                            <input type="number" name="cp_creditvalue" id="cp_creditvalue" class="form-control" required data-ng-model="cp.creditvalue"
+                            popover="Number of hours purchased."  
+                            popover-trigger="focus">
+                        </div>
+                    </div>
+                                    
+                    <div class="form-group">
+                        <label class="control-label" for="cp_creditprice">Price</label>
+                        <div class="controls">
+                            <input type="number" name="cp_creditprice" id="cp_creditprice" class="form-control" required data-ng-model="cp.creditprice"
+                            popover="Price."  
+                            popover-trigger="focus">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label" for="cp_effectivehourlyrate">Effective Hourly Rate (ex GST)</label>
+                        <div class="controls">
+                            <input type="number" name="cp_effectivehourlyrate" id="cp_effectivehourlyrate" class="form-control" required data-ng-model="cp.effectivehourlyrate"
+                            popover="Effective hourly rate."  
+                            popover-trigger="focus">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label" for="cp_creditinvoicenumber">Invoice No.</label>
+                        <div class="controls">
+                            <input type="number" name="cp_creditinvoicenumber" id="cp_creditinvoicenumber" class="form-control" required data-ng-model="cp.creditinvoicenumber"
+                            popover="Invoice number."  
+                            popover-trigger="focus">    
+                        </div>  
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label" for="cp_comment">Comment</label>
+                        <div class="controls">
+                            <textarea name="cp_comment" id="cp_comment" class="form-control" data-ng-model="cp.comment"
+                            popover="Comments."  
+                            popover-trigger="focus"></textarea>       
+                        </div>  
+                    </div>
+                    <div data-ng-show="message!=''" class="text-danger">
+    					<strong data-ng-bind="message"></strong>
+    				</div>               
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group-bla">
+                        <button type="submit" class="btn btn-default" data-ng-show="progress.processingAction==0"> Create Credit Purchase</button>
+                        <button type="button" class="btn btn-warning" data-ng-show="progress.processingAction==1">
+                            <span class="fa fa-refresh fa-spin"></span> processing credit purchase...
+                        </button>
+                        <button type="button" class="btn btn-default" data-ng-show="progress.processingAction==2 || progress.processingAction==-1" data-dismiss="modal"> Close</button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <!-- /iCareModel1 -->
+    
+    <form data-ng-submit="createTimeSheet()">
+    <div class="modal fade" id="iCareModal2" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" data-ng-show="progress.processingAction==-1 || progress.processingAction==0 || progress.processingAction==2"><span aria-hidden="true">&times;</span></button>
+                    <div class="modal-title"><i class="btn btn-md fa fa-clock-o"></i>New Time Sheet</div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label" for="ts_date">Date From</label>
+                        <div class="controls">
+                            <input type="date" name="ts_date" id="ts_date" class="form-control" required data-ng-model="ts.date">    
+                        </div>  
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label" for="ts_dateto">Date To</label>
+                        <div class="controls">
+                            <input type="date" name="ts_dateto" id="ts_dateto" class="form-control" required data-ng-model="ts.dateto">  
+                        </div>
+                    </div>
+                                    
+                    <div class="form-group">
+                        <label class="control-label" for="ts_submitors">Submitted By</label>
+                        <div class="controls">
+                            <input type="text" name="ts_submitors" id="ts_submitors" class="form-control" disabled data-ng-model="ts.submitors"
+                            popover="Time records submitted by."  
+                            popover-trigger="focus">
+                        </div>
+                    </div>                
+    
+                    <div data-ng-show="message!=''" class="text-danger">
+    					<strong data-ng-bind="message"></strong>
+    				</div>               
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group-bla">
+                        <button type="submit" class="btn btn-default" data-ng-show="progress.processingAction==0"> Create Time Sheet</button>
+                        <button type="button" class="btn btn-warning" data-ng-show="progress.processingAction==1">
+                            <span class="fa fa-refresh fa-spin"></span> processing time sheet...
+                        </button>
+                        <button type="button" class="btn btn-default" data-ng-show="progress.processingAction==2 || progress.processingAction==-1" data-dismiss="modal"> Close</button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <!-- /iCareModel2 -->
+    
+    <form data-ng-submit="createStatement()">
+    <div class="modal fade" id="iCareModal3" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" data-ng-show="progress.processingAction==-1 || progress.processingAction==0 || progress.processingAction==2"><span aria-hidden="true">&times;</span></button>
+                    <div class="modal-title"><i class="btn btn-md fa fa-list-alt"></i>New Statement</div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label" for="st_date">Date From</label>
+                        <div class="controls">
+                            <input type="date" name="st_date" id="st_date" class="form-control" required data-ng-model="st.date">    
+                        </div>  
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label" for="st_dateto">Date To</label>
+                        <div class="controls">
+                            <input type="date" name="st_dateto" id="st_dateto" class="form-control" required data-ng-model="st.dateto">  
+                        </div>
+                    </div>
+                                    
+                    <div class="form-group">
+                        <label class="control-label" for="st_submitors">Submitted By</label>
+                        <div class="controls">
+                            <input type="text" name="st_submitors" id="st_submitors" class="form-control" disabled data-ng-model="st.submitors"
+                            popover="Time records submitted by."  
+                            popover-trigger="focus">
+                        </div>
+                    </div>                
+    
+                    <div data-ng-show="message!=''" class="text-danger">
+    					<strong data-ng-bind="message"></strong>
+    				</div>               
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group-bla">
+                        <button type="submit" class="btn btn-default" data-ng-show="progress.processingAction==0"> Create Statement</button>
+                        <button type="button" class="btn btn-warning" data-ng-show="progress.processingAction==1">
+                            <span class="fa fa-refresh fa-spin"></span> processing statement...
+                        </button>
+                        <button type="button" class="btn btn-default" data-ng-show="progress.processingAction==2 || progress.processingAction==-1" data-dismiss="modal"> Close</button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <!-- /iCareModel3 -->
+
+    <form data-ng-submit="sendNotification()">
+    <div class="modal fade" id="iCareModal4" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" data-ng-show="progress.processingAction==-1 || progress.processingAction==0 || progress.processingAction==2"><span aria-hidden="true">&times;</span></button>
+                    <div class="modal-title"><i class="btn btn-md fa fa-envelope-o"></i>Notification</div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label" for="sn_sendto">Send To</label>
+                        <div class="controls">
+                            <input type="text" name="sn_sendto" id="sn_sendto" class="form-control" required disabled data-ng-model="sn.sendto" />
+                        </div>
+                    </div> 
+                    <div class="form-group">
+                        <label class="control-label" for="sn_ccto">Copy To</label>
+                        <div class="controls">
+                            <input type="text" name="sn_ccto" id="sn_ccto" class="form-control" data-ng-model="sn.ccto" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="sn_type">Type</label>
+                        <div class="controls">                            
+                            <select name="sn_type" id="sn_type" class="form-control" required data-ng-model="sn.type">
+                                <option value='1'>Type 1</option>
+                                <option value='2'>Type 2</option>
+                                <option value='3'>Type 3</option>
+                                <option value='0'>Other</option>
+                            </select>                                
+                        </div>  
+                    </div>                    
+                    <div class="form-group" data-ng-show="sn_type=='0'">
+                        <label class="control-label" for="sn_subject">Subject</label>
+                        <div class="controls">
+                            <input type="text" name="sn_type" id="sn_type" class="form-control" data-ng-required="sn_type=='0'" data-ng-model="sn.subject" />
+                        </div>
+                    </div>                                                          
+                    <div class="form-group">
+                        <label class="control-label" for="sn_message">Message</label>
+                        <div class="controls">
+                            <textarea name='sn_message' id="sn_message" class="form-control" rows="5" required data-ng-model="sn.message"></textarea>
+                        </div>
+                    </div>                
+    
+                    <div data-ng-show="message!=''" class="text-danger">
+    					<strong data-ng-bind="message"></strong>
+    				</div>               
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group-bla">
+                        <button type="submit" class="btn btn-default" data-ng-show="progress.processingAction==0"> Send Notification</button>
+                        <button type="button" class="btn btn-warning" data-ng-show="progress.processingAction==1">
+                            <span class="fa fa-refresh fa-spin"></span> Sending noification...
+                        </button>
+                        <button type="button" class="btn btn-default" data-ng-show="progress.processingAction==2 || progress.processingAction==-1" data-dismiss="modal"> Close</button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <!-- /iCareModel4 -->
+
+    <div class="modal fade" id="iCareModal5" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                    <div class="modal-title">Credit Purchase(s)</div>
+                </div>
+                <div class="modal-body">
+                    <table width="100%">
+                        <thead>
+                            <tr><th>Purchase Date</th><th>Purchased Amount</th><th>Invoice #</th></tr>
+    					</thead>
+                        <tbody>
+                            <tr ng-repeat="d in records"><td>{{d.Month}}</td><td>{{d.PurchasedAmount}}</td><td>{{d.Invoice}}</td></tr>
+                        </tbody>
+                    </table>       
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group-bla">
+                        <button type="button" class="btn btn-default"data-dismiss="modal"> Close</button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /iCareModel5 -->    
+    </small>
+            
+</section>

@@ -1,0 +1,95 @@
+<section data-ng-controller="CustomersController">
+    <div class="page-header">
+        <h1>New Customer</h1>
+    </div>
+    <div class="col-md-12">
+        <form class="form-horizontal" data-ng-submit="create()" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <label class="control-label" for="companyname">Company Name</label> 
+                    <i data-ng-show="loadingOrgNames" class="fa fa-refresh fa-spin"></i>
+                    <div class="controls">
+                        <input type="text" id="companyname" class="form-control" required 
+                        data-ng-model="companyname"
+                        typeahead="org for org in getOrgs($viewValue)"                   
+                        typeahead-loading="loadingOrgNames" 
+                        typeahead-min-length="3" 
+                        typeahead-wait-ms="750" 
+                        typeahead-on-select='onSelectOrg($item, $model, $label)'>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="contactname">Contact Name</label> 
+                    <i data-ng-show="loadingContacts" class="fa fa-refresh fa-spin"></i> 
+                    <div class="controls">
+                        <input type="text" id="contactname" class="form-control" required 
+                        data-ng-model="contactname"                        
+                        typeahead="cont for cont in getContacts($viewValue)" 
+                        typeahead-loading="loadingContacts"
+                        typeahead-min-length="3" 
+                        typeahead-wait-ms="750" 
+                        typeahead-on-select='onSelectContact($item, $model, $label)'>
+                    </div>
+                </div> 
+                <div class="form-group">
+                    <label class="control-label" for="customerlocation">Office Location</label>
+                    <div class="controls">
+                        <input type="text" id="customerlocation" class="form-control" required disabled 
+                        data-ng-model="customerlocation">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="accountexec">Account Exec</label>
+                    <div class="controls">
+                    </div>
+                        <input type="text" id="accountexec" class="form-control" required disabled
+                        data-ng-model="accountexec">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="projectname">Project Name</label>
+                    <div class="controls">
+                        <input type="text" id="projectname" class="form-control" required 
+                        data-ng-model="projectname"
+                        popover="This does not necessarily match a name used in the Projects database. Leave this as either blank or 'General' for most customers. Enter something else when two or more iCare accounts are used for one customer. This cannot contain hyphens."  
+                        popover-trigger="focus">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="statementline2opt">Statement heading line 2</label>
+                    <div class="radio">
+                        <label><input type="radio" name="statementline2opt" value="0"  
+                        data-ng-model="statementline2opt" 
+                        data-ng-click="statementline2show=0">None</label>
+                    </div>                    
+                    <div class="radio">
+                        <label><input type="radio" name="statementline2opt" value="1"
+                        data-ng-model="statementline2opt" 
+                        data-ng-click="statementline2show=0">Use project name</label>
+                    </div>                    
+                    <div class="radio">
+                        <label><input type="radio" name="statementline2opt" value="2"
+                        data-ng-model="statementline2opt" 
+                        data-ng-click="statementline2show=1">Specify other</label>
+                    </div>
+                    <div class="controls" ng-show="statementline2show">
+                        <input type="text" id="statementline2" class="form-control" 
+                        data-ng-model="statementline2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="additionalinfo">Additional Info</label>
+                    <div class="controls">
+                        <input type="text" id="additionalinfo" class="form-control"
+                        data-ng-bind="additionalinfo">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value='Save'>
+                </div>
+				<div data-ng-show="error" class="text-danger">
+					<strong data-ng-bind="error"></strong>
+				</div>
+            </fieldset>
+        </form>
+    </div>
+</section>
